@@ -160,7 +160,7 @@ pieChartPlatforms
 	    .dimension(platformDimension)
 	    .group(platformGroup)
 		.innerRadius(80)
-	    .ordinalColors(['#1E9E08','#363230']);
+	    .ordinalColors(['#00cc33','#000000']);
 
 //For GameYear Row Chart
 rowChartYears
@@ -172,7 +172,7 @@ rowChartYears
         .title(function (d) {
             return d.value;
         })
-        .ordinalColors(['#AB3629','#299EAB', '#1E9E08', '#363230'])
+        .ordinalColors(['#00cc33','#000000', '#003300', '#009966', '#00ccff'])
         .elasticX(true);
 
 //For Digital Pie Chart
@@ -187,7 +187,7 @@ pieChartDigital
 	    .label(function (d) {
             return d.key == 1 ? "Digital" : "Disc";
         })
-	    .ordinalColors(['#AB3629','#299EAB']);
+	    .ordinalColors(['#000000','#009966']);
 
 //For Finished Pie Chart
 pieChartFinished
@@ -201,7 +201,7 @@ pieChartFinished
 	    .label(function (d) {
             return d.key == 1 ? "Yes" : "No";
         })
-	    .ordinalColors(['#AB3629','#299EAB']);
+	    .ordinalColors(['#000000','#009966']);
 
 //For Replayed Pie Chart
 pieChartReplayed
@@ -215,7 +215,7 @@ pieChartReplayed
 	    .label(function (d) {
             return d.key == 1 ? "Yes" : "No";
         })
-	    .ordinalColors(['#AB3629','#299EAB']);
+	    .ordinalColors(['#000000','#009966']);
 
 //For Beta Pie Chart
 pieChartBeta
@@ -225,7 +225,7 @@ pieChartBeta
 	    .group(gameBetaGroup)
 		.legend(dc.legend())
 	    .renderLabel(false)
-	    .ordinalColors(['#363230','#1E9E08']);
+	    .ordinalColors(['#000000','#00ccff']);
 
 //For Mode Pie Chart
 pieChartMode
@@ -235,7 +235,7 @@ pieChartMode
 	    .group(gameModeGroup)
 		.legend(dc.legend())
 	    .renderLabel(false)
-	    .ordinalColors(['#1E9E08','#299EAB', '#AB3629']);
+	    .ordinalColors(['#000000','#00ccff', '#00cc33']);
 
 // 5 - Render Charts
 dc.renderAll();            
