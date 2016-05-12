@@ -37,7 +37,7 @@ var games_data = [
 	{"Title":"Madballs in Babo: Invasion","HoursPlayed":4,"Release":2009,"Aquired":"09-04-2012","Beta":0,"Type":"Shooter","RPG":0,"MMO":0,"Stealth":0,"StoryRich":0,"Horror":0,"Platformer":0,"PostApoc":0,"Finished":0,"Replayed":0,"Progress":6,"AchUnlocked":1,"AchTotal":17,"SinglePlayer":0,"MultiPlayer":1,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":0,"PreOrder":0},
 	{"Title":"Magicka","HoursPlayed":25,"Release":2011,"Aquired":"19-05-2011","Beta":0,"Type":"Adventure","RPG":1,"MMO":0,"Stealth":0,"StoryRich":1,"Horror":0,"Platformer":0,"PostApoc":0,"Finished":1,"Replayed":0,"Progress":50,"AchUnlocked":44,"AchTotal":88,"SinglePlayer":1,"MultiPlayer":1,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":0,"PreOrder":0},
 	{"Title":"Metro 2033","HoursPlayed":1,"Release":2010,"Aquired":"13-12-2012","Beta":0,"Type":"FPS","RPG":0,"MMO":0,"Stealth":1,"StoryRich":1,"Horror":1,"Platformer":0,"PostApoc":1,"Finished":0,"Replayed":0,"Progress":4,"AchUnlocked":2,"AchTotal":48,"SinglePlayer":1,"MultiPlayer":0,"Platform":"PC","App":"Steam","Payment":"Free to Play","Digital":1,"Discount":0,"PreOrder":0},
-	{"Title":"Monaco","HoursPlayed":1,"Release":2013,"Aquired":"22-06-2014","Beta":0,"Type":"Strategy","RPG":0,"MMO":0,"Stealth":1,"StoryRich":0,"Horror":0,"Platformer":0,"PostApoc":0,"Finished":0,"Replayed":5,"Progress":0,"AchUnlocked":0,"AchTotal":0,"SinglePlayer":0,"MultiPlayer":1,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":0,"PreOrder":0},
+	{"Title":"Monaco","HoursPlayed":1,"Release":2013,"Aquired":"22-06-2014","Beta":0,"Type":"Strategy","RPG":0,"MMO":0,"Stealth":1,"StoryRich":0,"Horror":0,"Platformer":0,"PostApoc":0,"Finished":0,"Replayed":1,"Progress":0,"AchUnlocked":0,"AchTotal":0,"SinglePlayer":0,"MultiPlayer":1,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":0,"PreOrder":0},
 	{"Title":"Orion: Prelude","HoursPlayed":0,"Release":2012,"Aquired":"21-06-2014","Beta":0,"Type":"FPS","RPG":0,"MMO":0,"Stealth":0,"StoryRich":0,"Horror":0,"Platformer":0,"PostApoc":0,"Finished":0,"Replayed":0,"Progress":0,"AchUnlocked":0,"AchTotal":245,"SinglePlayer":0,"MultiPlayer":1,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":0,"PreOrder":0},
 	{"Title":"Outlast","HoursPlayed":10,"Release":2013,"Aquired":"01-11-2015","Beta":0,"Type":"Survival","RPG":0,"MMO":0,"Stealth":0,"StoryRich":0,"Horror":1,"Platformer":0,"PostApoc":0,"Finished":0,"Replayed":0,"Progress":0,"AchUnlocked":0,"AchTotal":15,"SinglePlayer":1,"MultiPlayer":0,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":0,"PreOrder":0},
 	{"Title":"Payday 2","HoursPlayed":20,"Release":2013,"Aquired":"27-07-2014","Beta":0,"Type":"FPS","RPG":0,"MMO":0,"Stealth":1,"StoryRich":0,"Horror":0,"Platformer":0,"PostApoc":0,"Finished":0,"Replayed":0,"Progress":6,"AchUnlocked":24,"AchTotal":408,"SinglePlayer":0,"MultiPlayer":1,"Platform":"PC","App":"Steam","Payment":"Purchased","Digital":1,"Discount":1,"PreOrder":0},
@@ -79,16 +79,12 @@ var games_data = [
 ];
 
 // 2 - Create Graphs
-//var bubbleChart = dc.bubbleChart("#dc-bubble-graph");
-//var volumeChart = dc.barChart("#dc-volume-chart");
-//var lineChart = dc.lineChart("#dc-line-chart");
-//var dataTable = dc.dataTable("#dc-table-graph");
-//var nasdaqCount = dc.dataCount('.dc-data-count');
+var topGamesTable = dc.dataTable("#dc-table-top-games");
 var rowChartYears = dc.rowChart("#dc-row-graph-years");
 var pieChartPlatforms = dc.pieChart("#dc-pie-chart-platform");
 var pieChartDigital = dc.pieChart("#dc-pie-chart-digital");
-
-
+var pieChartFinished = dc.pieChart("#dc-pie-chart-finished");
+var pieChartReplayed = dc.pieChart("#dc-pie-chart-replayed");
 
 
 // 3 - Run Data thorugh crossfilters
@@ -97,13 +93,15 @@ var ndx = crossfilter(games_data);
 // 4 - Create Dimensions for Visualizations
 
 //For Total Games display
-var totalGames = ndx.groupAll().reduceCount().value();
-console.log("Total Games: " + totalGames + ".");
+var totalGamesGroup = ndx.groupAll().reduceCount();
 
 //For Total Achievments
 var achUnlocked = ndx.groupAll().reduceSum(function(fact) { return fact.AchUnlocked; }).value();
 var achTotal = ndx.groupAll().reduceSum(function(fact) { return fact.AchTotal; }).value();
 console.log("Total Achievments: " + achUnlocked + " out of " + achTotal + ".");
+
+//For Top Games
+var topGamesDimension = ndx.dimension(function(d) { return d.HoursPlayed; });
 
 //For Platform Pie Chart
 var platformDimension = ndx.dimension(function(d) { return d.Platform; });
@@ -117,19 +115,44 @@ var gameYearGroup = gameYearDimension.group().reduceCount();
 var gameDigitalDimension = ndx.dimension(function(d) { return d.Digital; });
 var gameDigitalGroup = gameDigitalDimension.group().reduceCount();
 
+//For Finished Pie Chart
+var gameFinishedDimension = ndx.dimension(function(d) { return d.Finished; });
+var gameFinishedGroup = gameFinishedDimension.group().reduceCount();
+
+//For Replayed Pie Chart
+var gameReplayedDimension = ndx.dimension(function(d) { return d.Replayed; });
+var gameReplayedGroup = gameReplayedDimension.group().reduceCount();
+
+
 // 5 - Create Visualizations
+
+topGamesTable
+	.width(1200)
+	.height(400)
+    .dimension(topGamesDimension)
+    .size(7)
+    .group(function(d) { return "" })
+    .columns([
+        function(d) { return d.Title; },
+        function(d) { return d.HoursPlayed; },
+        function(d) { return d.Type; },
+        function(d) { return d.Platform; },
+    ])
+    .sortBy(function(d){ return d.HoursPlayed; })
+    .order(d3.descending);
 
 //For Platform Pie Chart
 pieChartPlatforms
-		.width(450)
+		.width(600)
 		.height(375)
 	    .dimension(platformDimension)
 	    .group(platformGroup)
+		.innerRadius(80)
 	    .ordinalColors(['#1E9E08','#363230']);
 
 //For GameYear Row Chart
 rowChartYears
-		.width(800)
+		.width(1200)
         .height(400)
         .dimension(gameYearDimension)
         .group(gameYearGroup)
@@ -142,7 +165,7 @@ rowChartYears
 
 //For Digital Pie Chart
 pieChartDigital
-		.width(450)
+		.width(600)
 		.height(300)
 	    .dimension(gameDigitalDimension)
 	    .group(gameDigitalGroup)
@@ -150,7 +173,35 @@ pieChartDigital
 		//.legend(dc.legend())
 	    .renderLabel(true)
 	    .label(function (d) {
-            return d.key == 1 ? "Digital" : "DVD";
+            return d.key == 1 ? "Digital" : "Disc";
+        })
+	    .ordinalColors(['#1E9E08','#363230']);
+
+//For Finished Pie Chart
+pieChartFinished
+		.width(600)
+		.height(300)
+	    .dimension(gameFinishedDimension)
+	    .group(gameFinishedGroup)
+	    .innerRadius(50)
+		//.legend(dc.legend())
+	    .renderLabel(true)
+	    .label(function (d) {
+            return d.key == 1 ? "Yes" : "No";
+        })
+	    .ordinalColors(['#1E9E08','#363230']);
+
+//For Replayed Pie Chart
+pieChartReplayed
+		.width(600)
+		.height(300)
+	    .dimension(gameReplayedDimension)
+	    .group(gameReplayedGroup)
+	    .innerRadius(50)
+		//.legend(dc.legend())
+	    .renderLabel(true)
+	    .label(function (d) {
+            return d.key == 1 ? "Yes" : "No";
         })
 	    .ordinalColors(['#1E9E08','#363230']);
 
